@@ -1,15 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.SharePoint.Client.Utilities;
+using SP.Cmd.Deploy;
+using System.Web;
 
-namespace sp_autotitle
+namespace SPF.AutoTitle
 {
     class Program
     {
         static void Main(string[] args)
         {
+            SharePoint.CmdExecute(args, "SPF AutoTitle Solution",
+                options =>
+                {
+                    Model.Deploy(options);
+                },
+                options =>
+                {
+                    Model.Retract(options);
+                },
+                options =>
+                {
+                    Model.Execute(options);
+                }
+            );
+
+            var Stop = "";
         }
     }
 }
