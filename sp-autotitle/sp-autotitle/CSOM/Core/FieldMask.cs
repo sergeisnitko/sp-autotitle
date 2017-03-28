@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.Client.Utilities;
 using SPMeta2.BuiltInDefinitions;
 using System;
 using System.Collections;
@@ -81,13 +82,15 @@ namespace SPF.AutoTitle
             var InWeb = ctx.Site.OpenWeb(TargetListWebUrl);
             var InList = InWeb.GetList(TargetListUrl);
 
-            var Query = String.Format("<View Scope='RecursiveAll'><Query><Where><Gt><FieldRef Name='Modified' /><Value IncludeTimeValue='TRUE' Type='DateTime'>{0}</Value></Gt></Where></Query></View>",
-                RunSettings.PreviousRunDate.DateTimeValueOrEmpty("yyyy-MM-ddTHH:mm:ssZ"));
+            var Query = String.Format("<View Scope='RecursiveAll'><Query><Where><Gt><FieldRef Name='Modified' /><Value IncludeTimeValue='TRUE' StorageTZ='TRUE' Type='DateTime'>{0}</Value></Gt></Where></Query></View>",
+                            RunSettings.PreviousRunDate.ToUniversalTime().DateTimeValueOrEmpty());
+
             var ChangeQuery = new CamlQuery();
             ChangeQuery.ViewXml = Query;
             var ChangedItems = InList.GetItems(ChangeQuery);
-            InList.Context.Load(ChangedItems);
-            InList.Context.ExecuteQuery();
+            ctx.Load(ChangedItems);
+            ctx.ExecuteQuery();
+
             return ChangedItems.ToList();
         }
 
@@ -117,9 +120,13 @@ namespace SPF.AutoTitle
         {
             var ParentFolders = GetParentFolders(Item);
             var Props = FilterProperties(ParentFolders);
+            var tempMod = Item[BuiltInFieldDefinitions.Modified.InternalName];
+            var tempEditor = Item[BuiltInFieldDefinitions.Editor.InternalName];
+            var Value = "";
+            var UnmaskedProps = new Dictionary<string, string>();
 
             foreach (var Prop in Props)
-            {
+            { 
                 var Template = new SPFTemplate
                 {
                     Item = Item,
@@ -127,15 +134,31 @@ namespace SPF.AutoTitle
                     StartString = "[",
                     EndString = "]"
                 };
+                
 
-                var Value = Template.ToString();
-                var FieldInternalName = Prop.Key.Replace("_"+ FieldMaskSuffix,"").Trim();
-                Item[FieldInternalName] = Value;
-                Item.Update();
+                Value = Template.ToString();
+                UnmaskedProps.Add(Prop.Key.Replace("_" + FieldMaskSuffix, "").Trim(), Value);
+
+                //Item = ChangeValue(Item, FieldInternalName, Value);
             }
-            Item[BuiltInFieldDefinitions.Modified.InternalName] = Item[BuiltInFieldDefinitions.Modified.InternalName];
+
+            foreach (var Prop in UnmaskedProps)
+            {
+                Item[Prop.Key] = Prop.Value;
+            }
+
+            //Item["SpfContact"] = "ssssss";
+            //Item["SpfDescription"] = "ssssss";
+            Item[BuiltInFieldDefinitions.Modified.InternalName] = tempMod;
+            Item[BuiltInFieldDefinitions.Editor.InternalName] = tempEditor;
             Item.Update();
             ctx.ExecuteQuery();
+        }
+
+        public ListItem ChangeValue(ListItem Item, string FieldInternalName, object Value)
+        {
+            Item[FieldInternalName] = Value;
+            return Item;
         }
 
         public Dictionary<string, string> FilterProperties(List<Folder> ParentFolders)

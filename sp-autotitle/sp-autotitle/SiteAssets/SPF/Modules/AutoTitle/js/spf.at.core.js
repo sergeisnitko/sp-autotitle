@@ -109,6 +109,8 @@ spf.autotitle = function () {
             _ctx.rootFolder = _ctx.targetList.get_rootFolder();
             if (_DOM.FolderId) {
                 _ctx.item = _ctx.targetList.getItemById(_DOM.FolderId);
+                _ctx.clientContext.load(_ctx.targetList);
+                _ctx.clientContext.load(_ctx.targetList,"RootFolder");
                 _ctx.clientContext.load(_ctx.item);
                 _ctx.clientContext.load(_ctx.item, "Folder");
                 _ctx.rootFolder = _ctx.item.get_folder();
@@ -187,20 +189,28 @@ spf.autotitle = function () {
         }
         var fields = _ctx.fields.getEnumerator();
 
+        var TitleElem = document.querySelector("#DeltaPlaceHolderPageTitleInTitleArea a");
+        if (TitleElem) {
+            TitleElem.innerHTML = _ctx.targetList.get_title();
+            TitleElem.setAttribute("href", _ctx.targetList.get_rootFolder().get_serverRelativeUrl());
+        }
+
         var option = '<option value="[NextNumber]">Очередной рег.номер (NextNumber)</option>';
         m$(_DOM.selectedValue).append(option);
 
         while (fields.moveNext()) {
             var field = fields.get_current();
-            //console.log(field.get_typeAsString());
             var AdditProperty = "";
+            var AdditTitleProperty = "";
             if (field.get_typeAsString() == "DateTime") {
                 AdditProperty = ":dd.MM.yyyy HH:mm:ss";
             }
             if (field.get_typeAsString() == "Lookup") {
                 AdditProperty = ":LookupValue";
+                AdditTitleProperty = ": Отобр. значение";
+                m$(_DOM.selectedValue).append(String.format('<option value="[{0}{2}]">{1}{3} ({0})</option>', field.get_internalName(), field.get_title(), ":LookupId", ":ИД"));
             }
-            var option = String.format('<option value="[{0}{2}]">{1} ({0})</option>', field.get_internalName(), field.get_title(), AdditProperty);
+            var option = String.format('<option value="[{0}{2}]">{1}{3} ({0})</option>', field.get_internalName(), field.get_title(), AdditProperty, AdditTitleProperty);
 
             m$(_DOM.selectedValue).append(option);
             if ((availableTypes.indexOf(field.get_typeAsString().trim().toLowerCase()) != -1)

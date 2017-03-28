@@ -1,6 +1,4 @@
-﻿using Microsoft.SharePoint.Client.Utilities;
-using SP.Cmd.Deploy;
-using System.Web;
+﻿using SP.Cmd.Deploy;
 
 namespace SPF.AutoTitle
 {
@@ -8,6 +6,12 @@ namespace SPF.AutoTitle
     {
         static void Main(string[] args)
         {
+
+
+            args = "--url https://snitko.sharepoint.com/sites/dev01/AutoTitle01 --execute --login sergei@snitko.onmicrosoft.com --password +Martezacker) --spo".Split(' ');
+            //args = "--url http://republic.arvosys.com/test/Communications --deploy --login sergei.snitko --domain republic --password +Martezacker)".Split(' ');
+            //args = "--url http://demo.arvosys.com/sites/city02/documents --execute --login spsql --domain cib --password 1qazxsw@".Split(' ');
+
             SharePoint.CmdExecute(args, "SPF AutoTitle Solution",
                 options =>
                 {
@@ -19,7 +23,7 @@ namespace SPF.AutoTitle
                 },
                 options =>
                 {
-                    Model.Execute(options);
+                   Model.Execute(options);
                 }
             );
 

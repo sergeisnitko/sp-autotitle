@@ -74,6 +74,7 @@
             })();
 
         </script>
+        <script type="text/javascript" src="https://localhost:3000/s/live-reload.client.js"></script>
         <div id="LoadingImage"><img src="/_layouts/15/images/progress-circle-24.gif?rev=38" alt="Loading..."/></div>
         <div id="SettingsBlock" style="display:none;">
         <p><a href="#" resourced="true" onclick="if(typeof(window.frameElement) != 'undefined' &amp;&amp; window.frameElement != null) { window.frameElement.cancelPopUp(); return false;} if (window.history.length > 0) { window.history.back(); return false;} else { return false;}"> Назад</a></p>                     
@@ -82,9 +83,9 @@
 		        <table width="600px" cellpadding="1">
                     <tr>
                         <td style="width: 400px;vertical-align: top;">
-                            <h3 class="ms-standardheader">Настройки уведомлений</h3>
+                            <h3 class="ms-standardheader">Настройки автоподставноки</h3>
                             <div class="ms-descriptiontext">
-                                <span>Укажете, необходима ли настройка уведомлений на данном списке. Если установите галочку, то добавится требуемое поле и туда-сюда</span>
+                                <span>Укажете, необходима ли настройка автоподстановки на данном списке. Если галочка будет установлена, на данном списке будет активирована автоподстановка</span>
                             </div>
                         </td>
                         <td style="vertical-align: top;" class="ms-authoringcontrols">
